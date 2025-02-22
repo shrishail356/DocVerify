@@ -7,7 +7,7 @@ const projectSecret = "3de3d9c099c6c0c168e39b8bc03e2f7a";
 const ADMIN_ADDRESS = "0xbe7f6bBE7f0B5A93CdB4BD8E557896cE2ae695F1";
 
 window.CONTRACT = {
-  address: "0x73A284Ca7442A139300C1789b8c5907677E7C448",
+  address: "0xF3757C05279fF329C3a04FD168b484708466c13f",
   network: "Sepolia Testnet",
   explore: "https://sepolia.etherscan.io/",
   abi: [
