@@ -872,29 +872,73 @@ async function addExporter() {
     $("#ExporterBtn").slideUp();
     $("#note").html(`<h5 class="text-info">Please confirm the transaction 👍...</h5>`);
     
+    // Get gas estimate first
+    const gasEstimate = await window.contract.methods
+        .add_Exporter(address, info)
+        .estimateGas({ from: window.userAddress });
+
+    // Add 10% buffer to gas estimate
+    const gasLimit = Math.round(gasEstimate * 1.1);
+
+    // Get current gas price
+    const gasPrice = await web3.eth.getGasPrice();
+
     await window.contract.methods
-      .add_Exporter(address, info)
-      .send({ from: window.userAddress })
-      .on("transactionHash", function (hash) {
-        $("#note").html(`<h5 class="text-info">Please wait for transaction to be mined 😴...</h5>`);
-      })
-      .on("receipt", function (receipt) {
-        $("#loader").addClass("d-none");
-        $("#ExporterBtn").slideDown();
-        $("#note").html(`<h5 class="text-success">Exporter Added Successfully 😇</h5>`);
-      })
-      .on("error", function (error) {
-        console.error("Add exporter error:", error);
-        $("#note").html(`<h5 class="text-danger">${error.message}</h5>`);
-        $("#loader").addClass("d-none");
-        $("#ExporterBtn").slideDown();
-      });
+        .add_Exporter(address, info)
+        .send({ 
+            from: window.userAddress,
+            gas: gasLimit,
+            gasPrice: gasPrice
+        })
+        .on("transactionHash", function (hash) {
+            $("#note").html(`<h5 class="text-info">Please wait for transaction to be mined 😴...</h5>`);
+        })
+        .on("receipt", function (receipt) {
+            $("#loader").addClass("d-none");
+            $("#ExporterBtn").slideDown();
+            $("#note").html(`<h5 class="text-success">Exporter Added Successfully 😇</h5>`);
+            
+            // Log the actual gas used
+            console.log("Gas used:", receipt.gasUsed);
+        })
+        .on("error", function (error) {
+            console.error("Add exporter error:", error);
+            $("#note").html(`<h5 class="text-danger">${error.message}</h5>`);
+            $("#loader").addClass("d-none");
+            $("#ExporterBtn").slideDown();
+        });
   } catch (error) {
     console.error("Add exporter error:", error);
     $("#note").html(`<h5 class="text-danger">${error.message}</h5>`);
     $("#loader").addClass("d-none");
     $("#ExporterBtn").slideDown();
   }
+}
+
+// Add this helper function to format wei to ETH
+function weiToEth(wei) {
+    return web3.utils.fromWei(wei, 'ether');
+}
+
+// Add this function to estimate transaction cost
+async function estimateAddExporterCost(address, info) {
+    try {
+        const gasEstimate = await window.contract.methods
+            .add_Exporter(address, info)
+            .estimateGas({ from: window.userAddress });
+        
+        const gasPrice = await web3.eth.getGasPrice();
+        const totalCost = gasEstimate * gasPrice;
+        
+        console.log(`Estimated gas: ${gasEstimate}`);
+        console.log(`Gas price: ${weiToEth(gasPrice)} ETH`);
+        console.log(`Total cost: ${weiToEth(totalCost.toString())} ETH`);
+        
+        return totalCost;
+    } catch (error) {
+        console.error("Error estimating cost:", error);
+        throw error;
+    }
 }
 
 async function getExporterInfo() {
