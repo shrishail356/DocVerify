@@ -30,7 +30,7 @@
     <div class="container">
       <a class="navbar-brand" href="index.html">
         <i class="fa-solid fa-dragon home_text"></i>
-        <span class="home_text">Orio</span>Chain
+        <span class="home_text">Block</span>Verify
         </a>
       <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarSupportedContent" aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
       <span class="navbar-toggler-icon"></span>
@@ -157,7 +157,7 @@
             <div class="col-md-6 item text">
               <h3  data-aos="fade-right"> 
                  <i class="fa-solid fa-dragon"></i>
-                OrioChain</h3>
+                 Verify</h3>
               <!-- <a href="https://www.flaticon.com/free-icons/blockchain" title="blockchain icons">Blockchain icons created by photo3idea_studio - Flaticon</a> -->
               <p  data-aos="zoom-in">
                 Praesent sed lobortis mi. Suspendisse vel placerat ligula.
@@ -201,12 +201,12 @@
               <a href="#"><i class="fa-brands fa-instagram"> </i> </a>
             </div>
           </div>
-          <p class="copyright">OrioChain © 2022</p>
+          <p class="copyright">BlockVerify © 2022</p>
         </div>
   
       </footer>
     </div>
-    <div><a href="mailto:devaloshe@gmail.com?subject=From OrioChain Site"> 
+    <div><a href="mailto:devaloshe@gmail.com?subject=From BlockVerify Site"> 
       <i class="mail-us fa-solid fa-headset"></i>
     </a>
     <script src="./js/aos.js"></script>
@@ -227,5 +227,63 @@
 }
  
     </script>
+    <script>
+      async function connect() {
+        if (window.ethereum) {
+          try {
+            // Request account access
+            const accounts = await window.ethereum.request({ method: 'eth_requestAccounts' });
+            const account = accounts[0];
+            document.getElementById('userAddress').innerHTML = `Address: <span class="text-warning">${account}</span>`;
+
+            // Get the chain ID
+            const chainId = await window.ethereum.request({ method: 'eth_chainId' });
+            document.getElementById('network').innerHTML = `Network: <span class="text-warning">${parseInt(chainId, 16)}</span>`;
+
+            // Get the balance
+            const balance = await window.ethereum.request({
+              method: 'eth_getBalance',
+              params: [account, 'latest']
+            });
+            const etherBalance = parseFloat(window.web3.utils.fromWei(balance, 'ether')).toFixed(4);
+            document.getElementById('userBalance').innerHTML = `Balance: <span class="text-warning">${etherBalance} ETH</span>`;
+          } catch (error) {
+            console.error('Error connecting to wallet', error);
+          }
+        } else {
+          alert('Please install MetaMask!');
+        }
+      }
+
+      function disconnect() {
+        document.getElementById('userAddress').innerHTML = 'Address: <span class="text-warning">n/a</span>';
+        document.getElementById('network').innerHTML = 'Network: <span class="text-warning">n/a</span>';
+        document.getElementById('userBalance').innerHTML = 'Balance: <span class="text-warning">n/a</span>';
+      }
+    </script>
+
+    <!-- Add this somewhere visible -->
+    <div id="adminBadge"></div>
+
+    <!-- Add admin-only class to admin features -->
+    <div class="admin-only" style="display: none;">
+        <h3>Admin Controls</h3>
+        <!-- Your admin controls here -->
+    </div>
+
+    <!-- Example for add exporter form -->
+    <div class="admin-only" style="display: none;">
+        <div class="form-group">
+            <label for="Exporter-address">Exporter Address</label>
+            <input type="text" id="Exporter-address" class="form-control" />
+        </div>
+        <div class="form-group">
+            <label for="info">Exporter Info</label>
+            <input type="text" id="info" class="form-control" />
+        </div>
+        <button onclick="addExporter()" id="ExporterBtn" class="btn btn-primary">
+            Add Exporter
+        </button>
+    </div>
   </body>
 </html>
